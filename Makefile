@@ -2,7 +2,7 @@
 
 TAG="\n\n\033[0;32m\#\#\# "
 END=" \#\#\# \033[0m\n"
-PROJECT_PACKAGE=utility_mixins
+PROJECT_PACKAGE=cmd_line_tools
 
 
 test:
