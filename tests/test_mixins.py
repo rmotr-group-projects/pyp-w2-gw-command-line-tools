@@ -1,9 +1,10 @@
+import os
 import sys
 import unittest
 from mock import patch, MagicMock
 
 from cmd_line_tools.mixins import *
-
+import sqlite3
 
 class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
     def test_with_arguments(self):
@@ -50,51 +51,111 @@ def test_calculator_with_user_input(capsys):
     assert out == 'Hello World\nGoodbye World\n'
 
 
-class AuthenticationMixinsTestCase(unittest.TestCase):
+# class AuthenticationMixinsTestCase(unittest.TestCase):
 
-    def test_authenticate_user(self):
-        authenticated_mock = MagicMock(return_value={
-            'username': 'johndoe',
-            'password': 'password'
-        })
+#     def test_authenticate_user(self):
+#         authenticated_mock = MagicMock(return_value={
+#             'username': 'johndoe',
+#             'password': 'password'
+#         })
 
-        class DummyLoginCommand(LoginMixin):
-            def request_input_data(self, data):
-                if data == 'username':
-                    return 'johndoe'
-                elif data == 'password':
-                    return 'PWD$123'
+#         class DummyLoginCommand(LoginMixin):
+#             def request_input_data(self, data):
+#                 if data == 'username':
+#                     return 'johndoe'
+#                 elif data == 'password':
+#                     return 'PWD$123'
 
-            authenticate = authenticated_mock
+#             authenticate = authenticated_mock
 
-        obj = DummyLoginCommand()
-        user = obj.login()
+#         obj = DummyLoginCommand()
+#         user = obj.login()
 
-        self.assertEqual(user, {
-            'username': 'johndoe',
-            'password': 'password'
-        })
-        self.assertEqual(user, obj.user)
+#         self.assertEqual(user, {
+#             'username': 'johndoe',
+#             'password': 'password'
+#         })
+#         self.assertEqual(user, obj.user)
 
-        obj.authenticate.assert_called_once_with('johndoe', 'PWD$123')
-        self.assertTrue(obj.is_authenticated)
+#         obj.authenticate.assert_called_once_with('johndoe', 'PWD$123')
+#         self.assertTrue(obj.is_authenticated)
 
-    def test_invalid_user(self):
-        authenticated_mock = MagicMock(return_value=None)
+#     def test_invalid_user(self):
+#         authenticated_mock = MagicMock(return_value=None)
 
-        class DummyLoginCommand(LoginMixin):
-            def request_input_data(self, data):
-                if data == 'username':
-                    return 'no-user'
-                elif data == 'password':
-                    return 'no-pass'
+#         class DummyLoginCommand(LoginMixin):
+#             def request_input_data(self, data):
+#                 if data == 'username':
+#                     return 'no-user'
+#                 elif data == 'password':
+#                     return 'no-pass'
 
-            authenticate = authenticated_mock
+#             authenticate = authenticated_mock
 
-        obj = DummyLoginCommand()
-        user = obj.login()
+#         obj = DummyLoginCommand()
+#         user = obj.login()
 
-        self.assertIsNone(user)
-        obj.authenticate.assert_called_once_with('no-user', 'no-pass')
-        self.assertFalse(obj.is_authenticated)
-        self.assertIsNone(obj.user)
+#         self.assertIsNone(user)
+#         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
+#         self.assertFalse(obj.is_authenticated)
+#         self.assertIsNone(obj.user)
+
+class SqliteAuthenticationMixinsTestCase(unittest.TestCase):
+    '''
+    Test the SQLite authentication database
+    '''
+ 
+    def setUp(self):
+        """
+        set up a test database
+        """
+        conn = sqlite3.connect('test_database.db')
+        cursor = conn.cursor()
+ 
+        cursor.execute('''CREATE TABLE users(username text, password text)''') # create a table
+        users = [('Jane Doe', 'Test_PW_1'), ('John Doe', '123456')]
+        cursor.executemany("INSERT INTO users(username, password) VALUES (?, ?)", users) # populate it
+        conn.commit() # save it
+ 
+    def tearDown(self):
+        """
+        Delete the database
+        """
+        os.remove('test_database.db')
+        
+    def test_authenticate_valid_user(self):
+        """
+        Authenticates a valid user
+        """
+        conn = sqlite3.connect('test_database.db')
+        cursor = conn.cursor()
+        obj = SqliteAuthenticationMixin()
+        res = obj.authenticate('John Doe', '123456')
+        
+        self.assertEqual(res, 'Access granted')
+
+        
+        # self.assertEqual(len(result.fetchall()), 1)
+ 
+    # def test_authenticate_invalid_user(self):
+    #     """
+    #     Does not authenticate an invalid user
+    #     """
+    #     invalid_user_mock = MagicMock(return_value=None)
+
+    #     class DummyLoginCommand(LoginMixin):
+    #         def request_input_data(self, data):
+    #             if data == 'username':
+    #                 return 'Jane Doe'
+    #             elif data == 'password':
+    #                 return 'invalid password'
+
+    #     authenticate = invalid_user_mock
+
+    #     obj = DummyLoginCommand()
+    #     user = obj.login()
+
+    #     self.assertIsNone(user)
+    #     obj.authenticate.assert_called_once_with('no-user', 'no-pass')
+    #     self.assertFalse(obj.is_authenticated)
+    #     self.assertIsNone(obj.user)

@@ -1,6 +1,6 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SimpleAuthenticationMixin,
+    InputRequestMixin, SqliteAuthenticationMixin,
     LoginMixin)
 
 __all__ = [
@@ -63,7 +63,7 @@ class InputCalculatorCommand(SimpleCommandLineParserMixin,
 class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
                                          InputRequestMixin,
                                          StdoutOutputMixin,
-                                         SimpleAuthenticationMixin,
+                                         SqliteAuthenticationMixin,
                                          LoginMixin):
     AUTHORIZED_USERS = [{
         'username': 'admin',
