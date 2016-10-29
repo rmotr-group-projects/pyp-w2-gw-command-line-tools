@@ -12,6 +12,10 @@ __all__ = [
     'PokemonBerryCSVWriter']
 
 class BaseAllPokemonBerriesCommand(object):
+    """
+    Grabs entries for all berries from PokeAPI
+    and then outputs them
+    """
     REQUEST_URL = 'http://pokeapi.co/api/v2/berry/'
     
     def get_pokemon(self):
@@ -20,6 +24,7 @@ class BaseAllPokemonBerriesCommand(object):
 class PokemonBerryPrinter(PagedJSONDataMixin,
                      StdoutOutputMixin,
                      BaseAllPokemonBerriesCommand):
+    """ Prints to stdout """
     def main(self):
         results = self.get_pokemon()
         for berry in results:
@@ -29,13 +34,27 @@ class PokemonBerryCSVWriter(PagedJSONDataMixin,
                              CSVOutputMixin,
                              BaseAllPokemonBerriesCommand):
     FILE_PATH='pokemonberries.csv'
-    
+    """ Exports to CSV file """
     def main(self):
         results = self.get_pokemon()
         for berry in results:
             self.write(berry)       
 
 class BasePokemonCommand(object):
+    """
+    Retrieves info on a specific pokemon from PokeAPI
+    Works for both pokemon name and id in the api
+    ID/Name may be passed or will be requested
+    
+    Output as following:
+    Name: Pokemon Name
+    Moves:
+    move 1
+    move 2
+    ...
+    last move
+    """
+    
     URL = 'http://pokeapi.co/api/v2/pokemon/{}'
             
     OUTPUT_FORMAT = "\nName: {}\nMoves:\n{}"
@@ -54,18 +73,20 @@ class BasePokemonCommand(object):
         
 class InputBasedPokemon(SimpleCommandLineParserMixin,
                         InputRequestMixin,
-                        JSONDataRequestMixin,# Different mixin
+                        JSONDataRequestMixin,
                         StdoutOutputMixin,
                         BasePokemonCommand):
+    """ Retrieves pokemon based on user input """
     def main(self):
         result = self.get_pokemon()
         self.write("Result: {}".format(result))
 
 class CommandLinePokemon(SimpleCommandLineParserMixin,
                         ArgumentsRequestMixin,
-                        JSONDataRequestMixin,# Different mixin
+                        JSONDataRequestMixin,
                         StdoutOutputMixin,
                         BasePokemonCommand):
+    """ Retrieves pokemon based on command line argument """
     def main(self):
         self.parse_arguments()
         result = self.get_pokemon()
@@ -74,6 +95,10 @@ class CommandLinePokemon(SimpleCommandLineParserMixin,
 class RandomChooserPokemon(JSONDataRequestMixin,
                           StdoutOutputMixin,
                           BasePokemonCommand):
+    """
+    Retrieves information of random pokemon
+    N_POKEMON = Number of pokemon available from PokeAPI
+    """
     N_POKEMON = 811
     
     def main(self):

@@ -21,6 +21,11 @@ class FileOutputMixin(object):
             fp.write(message)
 
 class CSVOutputMixin(object):
+    """
+    Outputs to CSV file
+    Expects to receive dictionaries as input
+    Outputs fields in order of sorted(keys)
+    """
     FILE_PATH = None
     
     def write(self, message):
@@ -32,6 +37,7 @@ class CSVOutputMixin(object):
             fieldnames = list(sorted(message.keys()))
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             
+            # Only write headers if new file.
             if not file_exists:
                 writer.writeheader()
             writer.writerow(message)
