@@ -1,5 +1,7 @@
 import sys
+import os
 import unittest
+import csv
 from mock import patch, MagicMock
 
 from cmd_line_tools.mixins import *
@@ -98,3 +100,59 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+
+class JSONDataTestCase(unittest.TestCase):
+    
+    def test_json_data(self):
+        class YahooWeather(JSONDataRequestMixin):
+            REQUEST_URL="https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak    %22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"
+            
+            def get_city(self):
+                return self.request_data()['query']['results']['channel']['location']['city']
+        
+        yahoo = YahooWeather()
+        self.assertEqual(yahoo.get_city(), "Nome")
+        
+    def test_star_wars(self):
+        class StarWars(JSONDataRequestMixin):
+            REQUEST_URL="http://swapi.co/api/people/1"
+            
+            def get_name(self):
+                return self.request_data()['name']
+        
+        luke = StarWars()
+        self.assertEqual(luke.get_name(), "Luke Skywalker")
+        
+class PagedJSONDataTestCase(unittest.TestCase):
+    def test_paged_data(self):
+        class PokeTest(PagedJSONDataMixin):
+            REQUEST_URL="http://pokeapi.co/api/v2/berry"
+            
+            def num_berries(self):
+                return len(self.request_data())
+            
+        pokedata = PokeTest()
+        self.assertEqual(pokedata.num_berries(), 64)
+        
+class CSVOutputTestCase(unittest.TestCase):
+    def test_write_csv(self):
+        class CSVWriter(CSVOutputMixin):
+            FILE_PATH = 'test.csv'
+            def test_write(self):
+                test = {'test1': 'one', 'test2': 'two'}
+                self.write(test)
+        
+        w = CSVWriter()
+        # call write multiple times to make sure it isn't
+        # messing up the dictionary order
+        w.test_write()
+        w.test_write()
+        w.test_write()
+        
+        with open('test.csv') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                self.assertEqual(row['test1'], 'one')
+                self.assertEqual(row['test2'], 'two')
+                
+        os.remove(w.FILE_PATH)
