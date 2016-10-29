@@ -33,6 +33,11 @@ class SimpleAuthenticationMixin(object):
             if user == {'username': username, 'password': password}:
                 return user
 
+class JSONAuthenticationMixin(object):
+    AUTHORIZED_USERS = {}
+    
+    def get_user(self):
+        pass
 # Can you think two more authentication services?
 # A Json based service and one based on a sqlite3 database?
 # Both are builtin modules in Python, should be easy ;)

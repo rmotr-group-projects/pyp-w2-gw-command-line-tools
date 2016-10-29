@@ -1,6 +1,6 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SimpleAuthenticationMixin,
+    InputRequestMixin, SimpleAuthenticationMixin, JSONAuthenticationMixin,
     LoginMixin)
 
 __all__ = [
@@ -72,6 +72,20 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
         'username': 'rmotr',
         'password': 'python'
     }]
+
+    def main(self):
+        if self.is_authenticated:
+            username = self.user['username']
+            self.write("Welcome %s!" % username)
+        else:
+            self.write("Not authorized :(")
+            
+class PriviledgedArgumentsExampleCommandJSON(SimpleCommandLineParserMixin,
+                                         InputRequestMixin,
+                                         StdoutOutputMixin,
+                                         JSONAuthenticationMixin,
+                                         LoginMixin):
+    AUTHORIZED_USERS = {}
 
     def main(self):
         if self.is_authenticated:
