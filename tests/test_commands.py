@@ -62,6 +62,14 @@ def test_random_chooser_pokemon(capsys):
     out, err = capsys.readouterr()
     assert out.startswith("Result: \nName:")
 
+class RandomPokemonTester(unittest.TestCase):
+    def test_random_chooser_pokemon_with_bad_random(self):
+        #Test using known bad random value
+        rp = RandomChooserPokemon()
+        pokemon = rp._get_random_pokemon(id=752)
+        #print(pokemon)
+        assert pokemon.startswith("\nName:")
+
 
 def test_pokemon_printer(capsys):
     PokemonBerryPrinter().main()

@@ -58,18 +58,33 @@ class BasePokemonCommand(object):
     URL = 'http://pokeapi.co/api/v2/pokemon/{}'
             
     OUTPUT_FORMAT = "\nName: {}\nMoves:\n{}"
-            
+    
     def get_pokemon(self, name=None):
         if name is None:
             name = self.request_input_data('pokemon_name')
-        self.REQUEST_URL = self.URL.format(name)
-        data = self.request_data()
+        self._get_data(name)
         
-        moves = ""
-        for move in data['moves']:
-            moves += move['move']['name'] + "\n"
+        # 'details' only exists on error retrieving record
+        if 'detail' in self.data.keys():
+            raise ValueError("Invalid pokemon requested.")
+        
+        return self._format()
+        
+    def _get_data(self, id):
+        self.REQUEST_URL = self.URL.format(id)
+        self.data = self.request_data()
+        
+    def _format(self):
+        if self.data:
+            moves = ""
+            for move in self.data['moves']:
+                moves += move['move']['name'] + "\n"
             
-        return self.OUTPUT_FORMAT.format(data['name'], moves)
+            return self.OUTPUT_FORMAT.format(self.data['name'], moves)
+        else:
+            return ""
+        
+    
         
 class InputBasedPokemon(SimpleCommandLineParserMixin,
                         InputRequestMixin,
@@ -102,9 +117,21 @@ class RandomChooserPokemon(JSONDataRequestMixin,
     N_POKEMON = 811
     
     def main(self):
-        pokemon_id = random.choice(range(1,self.N_POKEMON))
-        result = self.get_pokemon(name=pokemon_id)
+        result = self._get_random_pokemon()
         self.write("Result: {}".format(result))
+        
+    def _get_random_pokemon(self,id=None):
+        #for testing purposes
+        if id is not None:
+            pokemon_id = id
+        else:
+            pokemon_id = random.choice(range(1,self.N_POKEMON))
+        try:
+            result = self.get_pokemon(name=pokemon_id)
+            return result
+        #retrieved invalid random pokemon, retrieve another
+        except ValueError:
+            return self._get_random_pokemon()
         
         
 class BaseCalculatorCommand(object):
