@@ -29,12 +29,11 @@ class LoginMixin(object):
 
 class SimpleAuthenticationMixin(object):
     AUTHORIZED_USERS = []
-    '''
+    
     def authenticate(self, username, password):
         for user in self.AUTHORIZED_USERS:
             if user == {'username': username, 'password': password}:
                 return user
-    '''
 
 class JSONAuthenticationMixin(object):
     
@@ -44,8 +43,8 @@ class JSONAuthenticationMixin(object):
                 return user
     
     def get_auth_users(self):
-        #replace hardcoded dict with readjson(file.json)
-        authorized_users = [{'username': 'jsondoe', 'password': 'xxx'}]
+        json_data = json.load(open('src/users.json'))
+        authorized_users = json_data['users']
         return authorized_users
         
 # Can you think two more authentication services?
