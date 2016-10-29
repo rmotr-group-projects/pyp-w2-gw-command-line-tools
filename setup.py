@@ -23,13 +23,13 @@ class PyTest(TestCommand):
 
 
 setup(
-    name='rmotr.com | Utility Mixins',
+    name='rmotr.com | Commandline Tools',
     version='0.0.1',
-    description="rmotr.com Group Project | Utility Mixins",
+    description="rmotr.com Group Project | Commandline Tools",
     author='rmotr.com',
     author_email='questions@rmotr.com',
     license='CC BY-SA 4.0 License',
-    packages=['utility_mixins'],
+    packages=['cmd_line_tools'],
     maintainer='rmotr.com',
     tests_require=[
         'pytest==3.0.3',

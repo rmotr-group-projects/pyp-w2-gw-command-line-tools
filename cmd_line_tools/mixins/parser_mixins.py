@@ -1,5 +1,7 @@
 import sys
 
+__all__ = ['SimpleCommandLineParserMixin']
+
 
 class SimpleCommandLineParserMixin(object):
     ARGUMENTS_ATTR_NAME = '_arguments'
@@ -11,8 +13,9 @@ class SimpleCommandLineParserMixin(object):
             if '=' in argv:
                 arguments.update(dict([tuple(argv.split('='))]))
 
+        # Equivalent:
         # self._arguments = arguments
         setattr(self, self.ARGUMENTS_ATTR_NAME, arguments)
 
 
-# argparse here maybe?
+# Can you implement an argparse version?

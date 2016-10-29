@@ -13,4 +13,4 @@ install:
   - pip install -r dev-requirements.txt
 
 script:
-  - "PYTHONPATH=. py.test --cov=utility_mixins tests"
+  - "PYTHONPATH=. py.test --cov=cmd_line_tools tests"
