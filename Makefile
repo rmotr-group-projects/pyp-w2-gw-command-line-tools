@@ -8,6 +8,10 @@ PROJECT_PACKAGE=cmd_line_tools
 test:
 	@echo $(TAG)Running tests$(END)
 	PYTHONPATH=. py.test -s tests
+	
+test-json:
+	@echo $(TAG)Running tests just on json extension$(END)	
+	PYTHONPATH=. py.test -s tests/test_mixins.py::JsonMixinTestCase
 
 test-cov:
 	@echo $(TAG)Running tests with coverage$(END)

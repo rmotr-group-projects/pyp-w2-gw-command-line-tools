@@ -98,3 +98,25 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+
+
+class JsonMixinTestCase(unittest.TestCase):
+    def test_json_user(self):
+        class DummyJSONLoginCommand(JSONAuthenticationMixin):
+            def main(self):
+                #username = 'johndoe'
+                #password = 'xxx'
+                self.authenticate(username, password)
+                
+        obj = DummyJSONLoginCommand()
+        user = obj.authenticate('jsondoe', 'xxx')
+        self.assertEqual(user, {'username' : 'jsondoe', 'password': 'xxx'})
+        
+    def test_invalid_json_user(self):
+        class InvalidJSONLoginCommand(JSONAuthenticationMixin):
+            def main(self):
+                self.authenticate(username, password)
+                
+        obj = InvalidJSONLoginCommand()
+        user = obj.authenticate('johndoe', '123')
+        self.assertEqual(user, None)

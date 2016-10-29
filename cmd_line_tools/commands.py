@@ -85,8 +85,6 @@ class PriviledgedArgumentsExampleCommandJSON(SimpleCommandLineParserMixin,
                                          StdoutOutputMixin,
                                          JSONAuthenticationMixin,
                                          LoginMixin):
-    AUTHORIZED_USERS = {}
-
     def main(self):
         if self.is_authenticated:
             username = self.user['username']
