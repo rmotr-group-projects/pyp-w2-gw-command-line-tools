@@ -4,13 +4,43 @@ from requests.exceptions import HTTPError
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
     InputRequestMixin, SimpleAuthenticationMixin,
-    LoginMixin, JSONDataRequestMixin, PagedJSONDataMixin, CSVOutputMixin)
+    LoginMixin, JSONDataRequestMixin, PagedJSONDataMixin, CSVOutputMixin,
+    PrintURLPageTitleToStdoutMixin, GoogleFeelingLuckyMixin, OpenURLInBrowser)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
     'PriviledgedArgumentsExampleCommand', 'InputBasedPokemon',
     'CommandLinePokemon','RandomChooserPokemon','PokemonBerryPrinter',
-    'PokemonBerryCSVWriter']
+    'PokemonBerryCSVWriter', 'StdoutArgsFeelingLucky']
+
+class BaseFeelingLucky(object):
+    """
+    Takes a search term and returns the Google I'm Feeling Lucky result
+    """
+    def feeling_lucky(self):
+        search_term = self.request_input_data('search_term')
+        url = self.request_data(search_term)
+        self.open(url)
+
+class StdoutArgsFeelingLucky(BaseFeelingLucky,
+                             GoogleFeelingLuckyMixin,
+                             ArgumentsRequestMixin,
+                             SimpleCommandLineParserMixin,
+                             PrintURLPageTitleToStdoutMixin):
+    """ Prints resulting page's title and url to stdout """
+    def main(self):
+        self.parse_arguments()
+        self.feeling_lucky()
+        
+class OpenInBrowserArgsFeelingLucky(BaseFeelingLucky,
+                                    GoogleFeelingLuckyMixin,
+                                    ArgumentsRequestMixin,
+                                    SimpleCommandLineParserMixin,
+                                    OpenURLInBrowser):
+    """ Opens resulting url in web browser """
+    def main(self):
+        self.parse_arguments()
+        self.feeling_lucky()
 
 class BaseAllPokemonBerriesCommand(object):
     """

@@ -2,6 +2,7 @@ import sys
 import os
 import unittest
 import csv
+import pytest
 from mock import patch, MagicMock
 
 from cmd_line_tools.mixins import *
@@ -158,3 +159,32 @@ class CSVOutputTestCase(unittest.TestCase):
                 
         # remove test file so we don't clutter up the filesystem
         os.remove(w.FILE_PATH)
+        
+class URLHandlerTestCase(unittest.TestCase):
+    
+    def test_invalid_url(self):
+        invalid_url = "this is not a valid url"
+        self.assertFalse(URLValidationMixin().validate(invalid_url))
+        
+    def test_valid_url(self):
+        valid_url = "http://www.google.com"
+        self.assertTrue(URLValidationMixin().validate(valid_url))
+        
+def test_print_url_to_stdout(capsys):
+    url = "http://www.google.com"
+    PrintURLToStdoutMixin().open(url)
+    out, err = capsys.readouterr()
+    assert url in out
+    
+def test_print_title_to_stdout(capsys):
+    url = "http://www.google.com"
+    title = "Google"
+    PrintURLPageTitleToStdoutMixin().open(url)
+    out, err = capsys.readouterr()
+    assert title in out
+        
+class GoogleTestCase(unittest.TestCase):
+    
+    def test_feeling_lucky(self):
+        EXPECTED_URL="https://www.google.com"
+        self.assertTrue(GoogleFeelingLuckyMixin().request_data('google'), EXPECTED_URL)

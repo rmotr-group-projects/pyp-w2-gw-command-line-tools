@@ -50,3 +50,10 @@ class PagedJSONDataMixin(object):
             for elem in r['results']:
                 data.append(elem)
         return data
+        
+class GoogleFeelingLuckyMixin(object):
+    GOOGLE_URL="http://www.google.com/search?q='{}'&btnI"
+    
+    def request_data(self, search_term):
+        url = self.GOOGLE_URL.format(search_term)
+        return requests.get(url).url

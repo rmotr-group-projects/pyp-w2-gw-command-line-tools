@@ -86,3 +86,14 @@ def test_berry_csv_writer(capsys):
         assert 'cheri' in [row['name'] for row in reader]
         
     os.remove('pokemonberries.csv')
+    
+def test_feeling_lucky_cmdline(capsys):
+    testargs = ["search_term=google"]
+    EXPECTED_URL = "https://www.google.com"
+    EXPECTED_TITLE = "Google"
+    
+    with patch.object(sys, 'argv', testargs):
+        StdoutArgsFeelingLucky().main()
+    
+    out, err = capsys.readouterr()
+    assert EXPECTED_TITLE in out
