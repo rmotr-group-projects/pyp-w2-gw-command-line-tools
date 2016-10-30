@@ -1,5 +1,6 @@
 
 import requests
+from requests.exceptions import HTTPError
 import json
 
 class JSONDataRequestMixin(object):
@@ -15,6 +16,8 @@ class JSONDataRequestMixin(object):
     
     def _get(self,url,params=None):
         r = requests.get(url, params=params)
+        if r.status_code != 200:
+            raise HTTPError('Unable to retrieve data. (HTTP status code: {}'.format(r.status_code))
         return r.json()
         
 class PagedJSONDataMixin(object):
@@ -31,6 +34,8 @@ class PagedJSONDataMixin(object):
     
     def _get(self,url):
         r = requests.get(url)
+        if r.status_code != 200:
+            raise HTTPError('Unable to retrieve data. (HTTP status code: {}'.format(r.status_code))
         return r.json()
         
     def _get_all(self,url):

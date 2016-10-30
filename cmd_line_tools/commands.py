@@ -1,4 +1,5 @@
 import random
+from requests.exceptions import HTTPError
 
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
@@ -63,11 +64,6 @@ class BasePokemonCommand(object):
         if name is None:
             name = self.request_input_data('pokemon_name')
         self._get_data(name)
-        
-        # 'details' only exists on error retrieving record
-        if 'detail' in self.data.keys():
-            raise ValueError("Invalid pokemon requested.")
-        
         return self._format()
         
     def _get_data(self, id):
@@ -130,7 +126,7 @@ class RandomChooserPokemon(JSONDataRequestMixin,
             result = self.get_pokemon(name=pokemon_id)
             return result
         #retrieved invalid random pokemon, retrieve another
-        except ValueError:
+        except HTTPError:
             return self._get_random_pokemon()
         
         
