@@ -9,13 +9,15 @@ class SimpleCommandLineParserMixin(object):
     def parse_arguments(self):
         arguments = getattr(self, self.ARGUMENTS_ATTR_NAME, {})
 
-        for argv in sys.argv:
-            if '=' in argv:
-                arguments.update(dict([tuple(argv.split('='))]))
+        for arg in sys.argv:
+            if '=' in arg:
+                #arguments.update(dict([tuple(arg.split('='))]))
+                key, value = arg.split('=')
+                arguments[key] = value
 
         # Equivalent:
-        # self._arguments = arguments
-        setattr(self, self.ARGUMENTS_ATTR_NAME, arguments)
+        self._arguments = arguments
+        #setattr(self, self.ARGUMENTS_ATTR_NAME, arguments)
 
 
 # Can you implement an argparse version?
