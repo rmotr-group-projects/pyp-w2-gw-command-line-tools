@@ -105,40 +105,23 @@ class SqliteAuthenticationMixinsTestCase(unittest.TestCase):
     Test the SQLite authentication database
     '''
 
-    def setUp(self):
-        """
-        set up a test database
-        """
-        conn = sqlite3.connect('test_database.db')
-        cursor = conn.cursor()
+    def test_invalid_user(self):
+        authenticated_mock = MagicMock(return_value=None)
 
-        cursor.execute('''CREATE TABLE users(username text, password text)''') # create a table
-        users = [('Jane Doe', '123'), ('John Doe', '123456')]
-        cursor.executemany("INSERT INTO users(username, password) VALUES (?, ?)", users) # populate it
-        conn.commit() # save it
+        class DummyLoginCommand(LoginMixin):
+            def request_input_data(self, data):
+                if data == 'username':
+                    return 'fake-user'
+                elif data == 'password':
+                    return 'fake-pass'
 
-    def tearDown(self):
-        """
-        Delete the database
-        """
-        os.remove('test_database.db')
+            authenticate = authenticated_mock
 
-    def test_authenticate_valid_user(self):
-        """
-        Authenticates a valid user
-        """
-        database = 'test_database.db'
-        obj = SqliteAuthenticationMixin()
-        res = obj.authenticate('Jane Doe', '123', database)
+        obj = DummyLoginCommand()
+        user = obj.login()
 
-        self.assertEqual(res, 'Access granted')
+        self.assertIsNone(user)
+        obj.authenticate.assert_called_once_with('fake-user', 'fake-pass')
+        self.assertFalse(obj.is_authenticated)
+        self.assertIsNone(obj.user)
 
-    def test_authenticate_invalid_user(self):
-        """
-        Does not authenticate an invalid user
-        """
-        database = 'test_database.db'
-        obj = SqliteAuthenticationMixin()
-        res = obj.authenticate('John Doe', '123', database)
-
-        self.assertEqual(res, 'Failed -- 1')

@@ -48,15 +48,18 @@ class SimpleAuthenticationMixin(object):
 
 
 class SqliteAuthenticationMixin(object):
-    def authenticate(self, username, password, database):
-        c = sqlite3.connect(database)
+    
+    def authenticate(self, username, password):
+        c = sqlite3.connect('logins.db')
         cursor = c.cursor()
+        # Current Users in Database: ('test_user', 'test_pass'), ('John Doe', '123456')
+        
         try:
             cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
             if cursor.fetchone():
-                return ('Access granted')
-            else:
-                return ('Failed -- 1')
+                return {'username': username, 'password': password}
+        except:
+            raise Exception('Database Connection Failure')
         finally:
             cursor.close()
 

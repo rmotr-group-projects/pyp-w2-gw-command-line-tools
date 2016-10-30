@@ -1,6 +1,6 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SqliteAuthenticationMixin,
+    InputRequestMixin, SqliteAuthenticationMixin, SimpleAuthenticationMixin,
     LoginMixin)
 
 __all__ = [
