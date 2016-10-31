@@ -15,7 +15,6 @@ class ArgumentsRequestMixin(SimpleCommandLineParserMixin):
     ARGUMENTS_ATTR_NAME = '_arguments'
 
     def request_input_data(self, input_name):
-        self.parse_arguments()
         return getattr(self, self.ARGUMENTS_ATTR_NAME).get(input_name)
         
 class FileRequestMixin(object):
