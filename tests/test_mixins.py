@@ -107,21 +107,38 @@ class SqliteAuthenticationMixinsTestCase(unittest.TestCase):
 
     def test_invalid_user(self):
         authenticated_mock = MagicMock(return_value=None)
+        error = 'Database Connection Failure'
 
         class DummyLoginCommand(LoginMixin):
             def request_input_data(self, data):
                 if data == 'username':
-                    return 'fake-user'
+                    return 'fake'
                 elif data == 'password':
-                    return 'fake-pass'
+                    return 'fake'
 
             authenticate = authenticated_mock
 
         obj = DummyLoginCommand()
         user = obj.login()
+        
+        self.assertIsNone(user) 
 
-        self.assertIsNone(user)
-        obj.authenticate.assert_called_once_with('fake-user', 'fake-pass')
-        self.assertFalse(obj.is_authenticated)
-        self.assertIsNone(obj.user)
+        # apparently not if you look at the starwars test. hrm.
+        with self.assertRaisesRegexp(Exception, error):
+            user = obj.login()
+            
 
+        
+        #     def test_people_model_not_found(self):
+        # error = ('Request to SWAPI "/api/people/100" failed with '
+        #          'status "404". Reason: {"detail": "Not found"}')
+        # with self.assertRaisesRegexp(SWAPIClientError, error):
+        #     People.get(100)
+        
+        
+            # https://docs.python.org/2/library/unittest.html
+            # with self.assertRaises(TypeError):
+            # s.split(2)
+        # obj.authenticate.assert_called_once_with('fake-user', 'fake-pass')
+        # self.assertFalse(obj.is_authenticated)
+        # self.assertIsNone(obj.user)

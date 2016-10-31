@@ -1,3 +1,3 @@
-from cmd_line_tools.commands import PriviledgedArgumentsExampleCommand
+from cmd_line_tools.commands import ArgumentCalculatorCommand
 
-PriviledgedArgumentsExampleCommand().main()
+ArgumentCalculatorCommand().main()

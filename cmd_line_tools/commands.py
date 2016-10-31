@@ -1,7 +1,7 @@
 from .mixins import (
-    SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SqliteAuthenticationMixin, SimpleAuthenticationMixin,
-    LoginMixin)
+    SimpleCommandLineParserMixin,
+    ArgumentsRequestMixin, StdoutOutputMixin, InputRequestMixin, 
+    SqliteAuthenticationMixin, SimpleAuthenticationMixin, LoginMixin)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
