@@ -5,13 +5,30 @@ from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
     InputRequestMixin, SimpleAuthenticationMixin,
     LoginMixin, JSONDataRequestMixin, PagedJSONDataMixin, CSVOutputMixin,
-    PrintURLPageTitleToStdoutMixin, GoogleFeelingLuckyMixin, OpenURLInBrowser)
+    PrintURLPageTitleToStdoutMixin, GoogleFeelingLuckyMixin, OpenURLInBrowser,
+    RequestValidatorMixin, ValidationError)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
     'PriviledgedArgumentsExampleCommand', 'InputBasedPokemon',
     'CommandLinePokemon','RandomChooserPokemon','PokemonBerryPrinter',
-    'PokemonBerryCSVWriter', 'StdoutArgsFeelingLucky']
+    'PokemonBerryCSVWriter', 'StdoutArgsFeelingLucky', 'ValidatedInputCommand']
+
+
+class ValidatedInputCommand(InputRequestMixin,
+                            RequestValidatorMixin,
+                            StdoutOutputMixin):
+    def __init__(self, validator=None):
+        self.validator = validator
+
+    def main(self):
+        self.request_input_data('data')
+        try:
+            result = self.validate(validator=self.validator)
+        except ValidationError as e:
+            result = str(e)
+        self.write(result)
+
 
 class BaseFeelingLucky(object):
     """
@@ -31,7 +48,7 @@ class StdoutArgsFeelingLucky(BaseFeelingLucky,
     def main(self):
         self.parse_arguments()
         self.feeling_lucky()
-        
+
 class OpenInBrowserArgsFeelingLucky(BaseFeelingLucky,
                                     GoogleFeelingLuckyMixin,
                                     ArgumentsRequestMixin,
@@ -48,10 +65,10 @@ class BaseAllPokemonBerriesCommand(object):
     and then outputs them
     """
     REQUEST_URL = 'http://pokeapi.co/api/v2/berry/'
-    
+
     def get_pokemon(self):
         return self.request_data()
-        
+
 class PokemonBerryPrinter(PagedJSONDataMixin,
                      StdoutOutputMixin,
                      BaseAllPokemonBerriesCommand):
@@ -60,7 +77,7 @@ class PokemonBerryPrinter(PagedJSONDataMixin,
         results = self.get_pokemon()
         for berry in results:
             self.write(berry['name'])
- 
+
 class PokemonBerryCSVWriter(PagedJSONDataMixin,
                              CSVOutputMixin,
                              BaseAllPokemonBerriesCommand):
@@ -69,14 +86,14 @@ class PokemonBerryCSVWriter(PagedJSONDataMixin,
     def main(self):
         results = self.get_pokemon()
         for berry in results:
-            self.write(berry)       
+            self.write(berry)
 
 class BasePokemonCommand(object):
     """
     Retrieves info on a specific pokemon from PokeAPI
     Works for both pokemon name and id in the api
     ID/Name may be passed or will be requested
-    
+
     Output as following:
     Name: Pokemon Name
     Moves:
@@ -85,33 +102,33 @@ class BasePokemonCommand(object):
     ...
     last move
     """
-    
+
     URL = 'http://pokeapi.co/api/v2/pokemon/{}'
-            
+
     OUTPUT_FORMAT = "\nName: {}\nMoves:\n{}"
-    
+
     def get_pokemon(self, name=None):
         if name is None:
             name = self.request_input_data('pokemon_name')
         self._get_data(name)
         return self._format()
-        
+
     def _get_data(self, id):
         self.REQUEST_URL = self.URL.format(id)
         self.data = self.request_data()
-        
+
     def _format(self):
         if self.data:
             moves = ""
             for move in self.data['moves']:
                 moves += move['move']['name'] + "\n"
-            
+
             return self.OUTPUT_FORMAT.format(self.data['name'], moves)
         else:
             return ""
-        
-    
-        
+
+
+
 class InputBasedPokemon(SimpleCommandLineParserMixin,
                         InputRequestMixin,
                         JSONDataRequestMixin,
@@ -141,11 +158,11 @@ class RandomChooserPokemon(JSONDataRequestMixin,
     N_POKEMON = Number of pokemon available from PokeAPI
     """
     N_POKEMON = 811
-    
+
     def main(self):
         result = self._get_random_pokemon()
         self.write("Result: {}".format(result))
-        
+
     def _get_random_pokemon(self,id=None):
         #for testing purposes
         if id is not None:
@@ -158,8 +175,8 @@ class RandomChooserPokemon(JSONDataRequestMixin,
         #retrieved invalid random pokemon, retrieve another
         except HTTPError:
             return self._get_random_pokemon()
-        
-        
+
+
 class BaseCalculatorCommand(object):
     """Base command to demonstrate the parsing/requesting mixins."""
 

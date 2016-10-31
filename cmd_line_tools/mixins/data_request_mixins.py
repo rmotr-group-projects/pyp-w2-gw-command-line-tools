@@ -1,9 +1,51 @@
+import re
 from six import moves
 
-import requests
-import json
 
-__all__ = ['InputRequestMixin', 'ArgumentsRequestMixin']
+__all__ = ['InputRequestMixin', 'ArgumentsRequestMixin',
+           'RequestValidatorMixin', 'ValidationError']
+
+
+class ValidationError(Exception):
+    pass
+
+
+class RequestValidatorMixin(object):
+    '''
+    A validator mixin which depends on an object which implements the
+    interface `request_input_data`
+    '''
+    _validators = {'slug_validator': '^[a-z0-9-]+$',
+                   'email_validator':
+                       '^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$',
+                   'ip_address_validator':
+                       '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.)'
+                       '{3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
+                   'html_tag_validator':
+                       '^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$'}
+
+    def _validate_regex(self, expression):
+        '''
+        returns true if regex is valid
+        '''
+        try:
+            re.compile(expression)
+            return True
+        except re.error:
+            return False
+
+    def get_validators(self):
+        return list(self._validators.keys)
+
+    def validate(self, validator='.*'):
+        # try to convert the validator to one of the built in expressions
+        validator = self._validators.get(validator, validator)
+        if self._validate_regex(validator):
+            data = self.request_input_data('data')
+            if re.match(validator, data):
+                return data
+            else:
+                raise ValidationError('{} is not valid.'.format(data))
 
 
 class InputRequestMixin(object):
@@ -17,16 +59,3 @@ class ArgumentsRequestMixin(object):
 
     def request_input_data(self, input_name):
         return getattr(self, self.ARGUMENTS_ATTR_NAME).get(input_name)
-
-
-class JSONDataRequestMixin(object):
-    #Assumes self.REQUEST_URL exists
-    def request_input_data(self, input_name):
-        data = self._get(self.REQUEST_URL)
-        return data[input_name]
-    
-    def _get(self,url,params=None):
-        r = requests.get(url, params=params)
-        return r.json()
-    
-    
