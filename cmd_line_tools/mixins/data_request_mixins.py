@@ -49,6 +49,7 @@ class RequestValidatorMixin(object):
 
 
 class InputRequestMixin(object):
+
     def request_input_data(self, input_name):
         value = moves.input("Please provide {}: ".format(input_name))
         return value

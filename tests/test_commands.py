@@ -37,9 +37,11 @@ def test_calculator_with_user_input(capsys):
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
 
+
 def pokemon_input_mock(message):
     if 'pokemon_name' in message:
         return 'bulbasaur'
+
 
 def test_pokemon_with_user_input(capsys):
     with patch('six.moves.input', pokemon_input_mock) as m:
@@ -47,6 +49,7 @@ def test_pokemon_with_user_input(capsys):
 
     out, err = capsys.readouterr()
     assert out.startswith("Result: \nName: bulbasaur\nMoves:\nrazor-wind")
+
 
 def test_pokemon_with_arguments(capsys):
     testargs = ["pokemon_name=bulbasaur"]
@@ -56,18 +59,21 @@ def test_pokemon_with_arguments(capsys):
     out, err = capsys.readouterr()
     assert out.startswith('Result: \nName: bulbasaur\nMoves:\nrazor-wind')
 
+
 def test_random_chooser_pokemon(capsys):
     RandomChooserPokemon().main()
 
     out, err = capsys.readouterr()
     assert out.startswith("Result: \nName:")
 
+
 class RandomPokemonTester(unittest.TestCase):
+
     def test_random_chooser_pokemon_with_bad_random(self):
-        #Test using known bad random value
+        # Test using known bad random value
         rp = RandomChooserPokemon()
         pokemon = rp._get_random_pokemon(id=752)
-        #print(pokemon)
+        # print(pokemon)
         assert pokemon.startswith("\nName:")
 
 
@@ -87,6 +93,7 @@ def test_berry_csv_writer(capsys):
 
     os.remove('pokemonberries.csv')
 
+
 def test_feeling_lucky_cmdline(capsys):
     testargs = ["search_term=google"]
     EXPECTED_URL = "https://www.google.com"
@@ -98,9 +105,11 @@ def test_feeling_lucky_cmdline(capsys):
     out, err = capsys.readouterr()
     assert EXPECTED_TITLE in out
 
+
 def valid_input_mock(message):
-	if 'data' in message:
-		return('john@gmail.com')
+    if 'data' in message:
+        return('john@gmail.com')
+
 
 def test_valid_input(capsys):
     with patch('six.moves.input', valid_input_mock) as m:
@@ -109,13 +118,15 @@ def test_valid_input(capsys):
     out, err = capsys.readouterr()
     assert out == "john@gmail.com\n"
 
+
 def invalid_input_mock(message):
-	if 'data' in message:
-		return('john q doe at gmail dot com')
+    if 'data' in message:
+        return('john q doe at gmail dot com')
+
 
 def test_invalid_input(capsys):
     with patch('six.moves.input', invalid_input_mock) as m:
         ValidatedInputCommand('email_validator').main()
 
     out, err = capsys.readouterr()
-    assert out.endswith ('is not valid.\n')
+    assert out.endswith('is not valid.\n')

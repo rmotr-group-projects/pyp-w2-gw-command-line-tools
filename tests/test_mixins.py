@@ -9,6 +9,7 @@ from cmd_line_tools.mixins import *
 
 
 class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
+
     def test_with_arguments(self):
         testargs = ["my_script", "username=johndoe", "password=123"]
         with patch.object(sys, 'argv', testargs):
@@ -26,6 +27,7 @@ class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
 
 
 class InputTestCase(unittest.TestCase):
+
     def test_with_simple_arguments_request(self):
         mixin = InputRequestMixin()
         # Patch Username
@@ -44,6 +46,7 @@ class InputTestCase(unittest.TestCase):
 # See test_commands.py for an explanation of this test
 def test_calculator_with_user_input(capsys):
     class DummyTestingClass(StdoutOutputMixin):
+
         def main(self):
             self.write("Hello World")
             self.write("Goodbye World")
@@ -62,6 +65,7 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         })
 
         class DummyLoginCommand(LoginMixin):
+
             def request_input_data(self, data):
                 if data == 'username':
                     return 'johndoe'
@@ -86,6 +90,7 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         authenticated_mock = MagicMock(return_value=None)
 
         class DummyLoginCommand(LoginMixin):
+
             def request_input_data(self, data):
                 if data == 'username':
                     return 'no-user'
@@ -102,12 +107,14 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
 
+
 class JSONDataTestCase(unittest.TestCase):
 
     def test_json_data(self):
         class YahooWeather(JSONDataRequestMixin):
-            # Default request url from yahoo weather api documentation, points to Nome, AK
-            REQUEST_URL="https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak    %22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"
+            # Default request url from yahoo weather api documentation, points
+            # to Nome, AK
+            REQUEST_URL = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22nome%2C%20ak    %22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"
 
             def get_city(self):
                 return self.request_data()['query']['results']['channel']['location']['city']
@@ -117,7 +124,7 @@ class JSONDataTestCase(unittest.TestCase):
 
     def test_star_wars(self):
         class StarWars(JSONDataRequestMixin):
-            REQUEST_URL="http://swapi.co/api/people/1"
+            REQUEST_URL = "http://swapi.co/api/people/1"
 
             def get_name(self):
                 return self.request_data()['name']
@@ -125,10 +132,12 @@ class JSONDataTestCase(unittest.TestCase):
         luke = StarWars()
         self.assertEqual(luke.get_name(), "Luke Skywalker")
 
+
 class PagedJSONDataTestCase(unittest.TestCase):
+
     def test_paged_data(self):
         class PokeTest(PagedJSONDataMixin):
-            REQUEST_URL="http://pokeapi.co/api/v2/berry"
+            REQUEST_URL = "http://pokeapi.co/api/v2/berry"
 
             def num_berries(self):
                 return len(self.request_data())
@@ -136,10 +145,13 @@ class PagedJSONDataTestCase(unittest.TestCase):
         pokedata = PokeTest()
         self.assertEqual(pokedata.num_berries(), 64)
 
+
 class CSVOutputTestCase(unittest.TestCase):
+
     def test_write_csv(self):
         class CSVWriter(CSVOutputMixin):
             FILE_PATH = 'test.csv'
+
             def test_write(self):
                 test = {'test1': 'one', 'test2': 'two'}
                 self.write(test)
@@ -160,6 +172,7 @@ class CSVOutputTestCase(unittest.TestCase):
         # remove test file so we don't clutter up the filesystem
         os.remove(w.FILE_PATH)
 
+
 class URLHandlerTestCase(unittest.TestCase):
 
     def test_invalid_url(self):
@@ -170,11 +183,13 @@ class URLHandlerTestCase(unittest.TestCase):
         valid_url = "http://www.google.com"
         self.assertTrue(URLValidationMixin().validate(valid_url))
 
+
 def test_print_url_to_stdout(capsys):
     url = "http://www.google.com"
     PrintURLToStdoutMixin().open(url)
     out, err = capsys.readouterr()
     assert url in out
+
 
 def test_print_title_to_stdout(capsys):
     url = "http://www.google.com"
@@ -183,11 +198,13 @@ def test_print_title_to_stdout(capsys):
     out, err = capsys.readouterr()
     assert title in out
 
+
 class GoogleTestCase(unittest.TestCase):
 
     def test_feeling_lucky(self):
-        EXPECTED_URL="https://www.google.com"
-        self.assertTrue(GoogleFeelingLuckyMixin().request_data('google'), EXPECTED_URL)
+        EXPECTED_URL = "https://www.google.com"
+        self.assertTrue(GoogleFeelingLuckyMixin(
+        ).request_data('google'), EXPECTED_URL)
 
 
 class RequestValidatorTestCase(unittest.TestCase):
@@ -195,6 +212,7 @@ class RequestValidatorTestCase(unittest.TestCase):
     Test using a class since RequestValidatorMixin depends on an input mixin
     '''
     class ValidatedInput(InputRequestMixin, RequestValidatorMixin):
+
         def __init__(self, validator=None):
             self.validator = validator
 
@@ -221,7 +239,7 @@ class RequestValidatorTestCase(unittest.TestCase):
                 self.assertEqual(value, ip)
 
     def test_invalid_ip_addresses(self):
-        invalid_ip = ['10.a.23.1','my_ip', '0.0.0.256', '192.168.0.256']
+        invalid_ip = ['10.a.23.1', 'my_ip', '0.0.0.256', '192.168.0.256']
         for ip in invalid_ip:
             with patch('six.moves.input', return_value=ip) as m:
                 with self.assertRaises(ValidationError):
