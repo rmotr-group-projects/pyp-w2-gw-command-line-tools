@@ -58,8 +58,8 @@ class SqliteAuthenticationMixin(object):
             cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
             if cursor.fetchone():
                 return {'username': username, 'password': password}
-        except:
-            raise Exception('Database Connection Failure')
+        # except:
+        #     raise Exception('Database Connection Failure')
         finally:
             cursor.close()
 
