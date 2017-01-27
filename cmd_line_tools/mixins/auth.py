@@ -1,3 +1,5 @@
+import re
+
 class LoginMixin(object):
     """Basic login mixin.
 
@@ -33,6 +35,13 @@ class SimpleAuthenticationMixin(object):
             if user == {'username': username, 'password': password}:
                 return user
 
-# Can you think two more authentication services?
-# A Json based service and one based on a sqlite3 database?
-# Both are builtin modules in Python, should be easy ;)
+
+# 1. Email testing Mixin
+class SimpleEmailMixin(object):
+
+    def authenticate(self, email):
+        valid_email = re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email)
+        if not valid_email:
+            raise Exception("Not a valid email.")
+        else:
+            return email

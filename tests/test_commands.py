@@ -1,7 +1,7 @@
 import sys
 import unittest
 import pytest
-from mock import patch
+from mock import patch, Mock
 
 from cmd_line_tools.commands import *
 
@@ -28,9 +28,30 @@ def something(message):
         return 'subtraction'
 
 
+def invalid_something(message):
+    if 'ticker' in message:
+        return 'ZZZZZZ'
+    if 'choice' in message:
+        return 'rmotr'
+
+
 def test_calculator_with_user_input(capsys):
     with patch('six.moves.input', something) as m:
         InputCalculatorCommand().main()
 
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
+
+    
+def test_invalid_choice_paper_rock_scissors(capsys):
+    with patch('six.moves.input', invalid_something) as m:
+        RockPaperScissorsGame().main()
+        
+    out, err = capsys.readouterr()
+    assert out == "You lose, that's not a valid choice!\n"
+    
+
+def test_stock_invalid_ticker(capsys):
+    with patch('six.moves.input', invalid_something) as m:
+        with pytest.raises(SyntaxError):
+            StockInfo().main()
