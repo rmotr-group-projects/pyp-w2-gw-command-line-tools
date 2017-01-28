@@ -2,7 +2,6 @@ import os
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
-
 class PyTest(TestCommand):
     user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
 
@@ -36,7 +35,8 @@ setup(
         'pytest-cov==2.4.0',
         'coverage==4.2',
         'six==1.10.0',
-        'mock==2.0.0'
+        'mock==2.0.0',
+        'requests==2.13.0' # added
     ],
     zip_safe=False,
     cmdclass={'test': PyTest},

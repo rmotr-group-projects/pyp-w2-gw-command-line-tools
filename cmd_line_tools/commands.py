@@ -1,4 +1,5 @@
-from mixins import (
+#from mixins import ( # originally line 1
+from cmd_line_tools.mixins import ( # new line 1
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
     InputRequestMixin, SimpleAuthenticationMixin,
     LoginMixin)
