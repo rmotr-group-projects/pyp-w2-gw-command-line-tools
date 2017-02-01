@@ -4,6 +4,7 @@ import pytest
 from mock import patch, Mock
 
 from cmd_line_tools.commands import *
+from cmd_line_tools.mixins import *
 
 
 # These tests are written in a different way than the ones you're probably
