@@ -98,3 +98,21 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+
+
+class EmailMixinTest(unittest.TestCase):
+    
+    def test_email_is_valid(self):
+        test_email = 'janedoe@gmail.com'
+        with patch.object(sys, 'argv', test_email):
+            m = SimpleEmailMixin()
+            m.authenticate(test_email)
+            self.assertEqual(m.authenticate(test_email), test_email)
+    
+    def test_email_not_valid(self):
+        test_email = 'janedoegmail.com'
+        with patch.object(sys, 'argv', test_email):
+            m = SimpleEmailMixin()
+            with self.assertRaises(Exception):
+                m.authenticate(test_email)
+
