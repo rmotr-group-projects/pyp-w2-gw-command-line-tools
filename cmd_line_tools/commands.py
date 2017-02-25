@@ -1,11 +1,12 @@
-from .mixins import (
+from cmd_line_tools.mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SimpleAuthenticationMixin,
-    LoginMixin)
+    InputRequestMixin, SimpleAuthenticationMixin, LoginMixin, WeatherMixin,
+    ApiCheckMixin)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
+    'PriviledgedArgumentsExampleCommand', 'WeatherMixin', 'ApiCheckMixin', 
+    'ArgumentWeatherCommand', 'InputWeatherCommand']
 
 
 class BaseCalculatorCommand(object):
@@ -79,3 +80,64 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+
+
+class BaseWeatherCommand(object):
+    """Base command for Checking the Weather using OpenWeatherMap's API.
+    The user will first be authenticated by username and password. Then, 
+    an API key must be entered to check that it is valid. When requesting
+    the weather, a zipcode(11229, 90210, etc) and country code(us, nz, etc)
+    must also be entered."""
+    AUTHORIZED_USERS = [{
+        'username': 'admin',
+        'password': 'admin'
+    }, {
+        'username': 'rmotr',
+        'password': 'python'
+    }, {
+        'username': 'rmotr_user',
+        'password': 'python123'
+    }]
+    def make_weather_request(self):
+        if self.is_authenticated:
+            api_key = self.request_input_data("api_key")
+            if self.authenticate_key(api_key):
+                userzip = self.request_input_data("zipcode")
+                usercountry = self.request_input_data("countrycode")
+                user_weather = self.checkweather(userzip, usercountry, api_key)
+                return user_weather
+            return "Sorry, your API key is not valid! :( </3"
+        return "Sorry, you are not authenticated to use this super secret API..."
+
+
+class ArgumentWeatherCommand(SimpleCommandLineParserMixin,
+                                ArgumentsRequestMixin, 
+                                StdoutOutputMixin, WeatherMixin,
+                                BaseWeatherCommand, LoginMixin,
+                                SimpleAuthenticationMixin, ApiCheckMixin):
+    
+    """Extends the BaseCalculatorCommand to receive cmd line arguments."""
+    def main(self):
+        self.parse_arguments()
+        result = self.make_weather_request()
+        if __name__ == '__main__':
+            weather_statement = "The temperature is {} degrees with {}.".format(result["main"]["temp"], result["weather"][0]["description"])
+            self.write("Result: {}".format(weather_statement))
+        else:
+            self.write("Result: {}, {}".format(result["name"], result["sys"]["country"]))
+
+
+class InputWeatherCommand(SimpleCommandLineParserMixin,
+                             InputRequestMixin,  # Different mixin
+                             StdoutOutputMixin,
+                             BaseWeatherCommand, WeatherMixin,
+                            SimpleAuthenticationMixin, LoginMixin, ApiCheckMixin):
+    
+    """Extends the BaseWeatherCommand and will ask for user input."""
+    def main(self):
+        result = self.make_weather_request()
+        if __name__ == '__main__':
+            weather_statement = "The temperature is {} degrees with {}.".format(result["main"]["temp"], result["weather"][0]["description"])
+            self.write("Result: {}".format(weather_statement))
+        else:
+            self.write("Result: {}, {}".format(result["name"], result["sys"]["country"]))
