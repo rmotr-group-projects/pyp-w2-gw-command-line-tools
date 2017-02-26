@@ -1,9 +1,10 @@
+import os
 import sys
 import unittest
 from mock import patch, MagicMock
 
 from cmd_line_tools.mixins import *
-
+import sqlite3
 
 class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
     def test_with_arguments(self):
@@ -98,3 +99,26 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+
+class SqliteAuthenticationMixinsTestCase(unittest.TestCase):
+    '''
+    Test the SQLite authentication database
+    '''
+
+    def test_invalid_user(self):
+        authenticated_mock = MagicMock(return_value=None)
+        error = 'Database Connection Failure'
+
+        class DummyLoginCommand(LoginMixin):
+            def request_input_data(self, data):
+                if data == 'username':
+                    return 'fake'
+                elif data == 'password':
+                    return 'fake'
+
+            authenticate = authenticated_mock
+
+        obj = DummyLoginCommand()
+        user = obj.login()
+        
+        self.assertIsNone(user) 
