@@ -1,11 +1,12 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
     InputRequestMixin, SimpleAuthenticationMixin,
-    LoginMixin)
+    LoginMixin, LangDetectMixin, FileRequestMixin)
+from .languages import LANGUAGES as langs
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
+    'PriviledgedArgumentsExampleCommand', 'InputLangAnalyzer', 'ArgumentLangAnalyzer', 'FileArgumentLangAnalyzer']
 
 
 class BaseCalculatorCommand(object):
@@ -27,10 +28,13 @@ class BaseCalculatorCommand(object):
             raise AttributeError('Invalid Operation: %s' % operation)
 
         return self.OPERATIONS[operation](x_value, y_value)
+        
+    def main(self):
+        result = self.calculate()
+        self.write("Result: {}".format(result))
 
 
-class ArgumentCalculatorCommand(SimpleCommandLineParserMixin,
-                                ArgumentsRequestMixin,  # Different mixin
+class ArgumentCalculatorCommand(ArgumentsRequestMixin,  # Different mixin
                                 StdoutOutputMixin,
                                 BaseCalculatorCommand):
     """Extends the BaseCalculatorCommand to receive cmd line arguments.
@@ -38,15 +42,9 @@ class ArgumentCalculatorCommand(SimpleCommandLineParserMixin,
     Should be invoked:
     - python cmd.py x_value=15 y_value=7 operation=addition
     """
+    pass
 
-    def main(self):
-        self.parse_arguments()
-        result = self.calculate()
-        self.write("Result: {}".format(result))
-
-
-class InputCalculatorCommand(SimpleCommandLineParserMixin,
-                             InputRequestMixin,  # Different mixin
+class InputCalculatorCommand(InputRequestMixin,  # Different mixin
                              StdoutOutputMixin,
                              BaseCalculatorCommand):
     """Extends the BaseCalculatorCommand and will ask for user input.
@@ -54,14 +52,9 @@ class InputCalculatorCommand(SimpleCommandLineParserMixin,
     Should be invoked:
     - python cmd.py
     """
+    pass
 
-    def main(self):
-        result = self.calculate()
-        self.write("Result: {}".format(result))
-
-
-class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
-                                         InputRequestMixin,
+class PriviledgedArgumentsExampleCommand(InputRequestMixin,
                                          StdoutOutputMixin,
                                          SimpleAuthenticationMixin,
                                          LoginMixin):
@@ -79,3 +72,35 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+
+class LangAnalyzerBase(LangDetectMixin, StdoutOutputMixin):
+    #Possible TODO:
+    #language file location as cmd argument
+    #extract language file contents, store it
+    LANGUAGES = langs
+    
+    def analyze_user_text(self):
+        text = self.request_input_data('text')
+        language = self.detect_language(text)
+        self.write('Analysis has detected {}.'.format(language))
+        
+    main = analyze_user_text
+        
+class InputLangAnalyzer(LangAnalyzerBase, InputRequestMixin):
+    pass
+    
+class ArgumentLangAnalyzer(LangAnalyzerBase, ArgumentsRequestMixin):
+    """
+    should be invoked with command line parameter of this form: text="blah blah blah"
+    """
+    pass
+
+class FileArgumentLangAnalyzer(FileRequestMixin, ArgumentLangAnalyzer):
+    FILE_KEY = 'text'
+    """
+    pass a file via cmd line parameter file=filename
+    """
+    def main(self):
+        self.FILE_NAME = self.request_input_data('file')
+        return super(FileArgumentLangAnalyzer, self).main()
+        
