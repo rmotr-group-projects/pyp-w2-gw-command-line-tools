@@ -60,3 +60,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+#Ignore C9 Garbage Files
+**/.~c9*

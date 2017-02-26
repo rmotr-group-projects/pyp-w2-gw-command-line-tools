@@ -36,7 +36,9 @@ setup(
         'pytest-cov==2.4.0',
         'coverage==4.2',
         'six==1.10.0',
-        'mock==2.0.0'
+        'mock==2.0.0',
+        'requests==2.11.1',
+        'beautifulsoup4==4.5.1'
     ],
     zip_safe=False,
     cmdclass={'test': PyTest},
