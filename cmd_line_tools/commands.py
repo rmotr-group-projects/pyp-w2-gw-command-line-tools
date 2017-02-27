@@ -1,7 +1,7 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
     InputRequestMixin, SimpleAuthenticationMixin,
-    LoginMixin)
+    LoginMixin, CheckResetRequiredMixin)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
@@ -64,6 +64,7 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
                                          InputRequestMixin,
                                          StdoutOutputMixin,
                                          SimpleAuthenticationMixin,
+                                         CheckResetRequiredMixin,
                                          LoginMixin):
     AUTHORIZED_USERS = [{
         'username': 'admin',
@@ -71,11 +72,19 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
     }, {
         'username': 'rmotr',
         'password': 'python'
+    }, {
+        'username': 'admin*',
+        'password': 'admin'
     }]
 
     def main(self):
-        if self.is_authenticated:
+        login = self.is_authenticated
+        if login == 'auth':
             username = self.user['username']
             self.write("Welcome %s!" % username)
+        elif login == 'auth_pw_reset':
+            self.write("Password reset required")
         else:
             self.write("Not authorized :(")
+
+
