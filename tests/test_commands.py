@@ -34,3 +34,17 @@ def test_calculator_with_user_input(capsys):
 
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
+    
+
+def something2(message):
+    if 'username' in message:
+        return 'admin'
+    if 'password' in message:
+        return 'admin'
+    
+def test_priviledge(capsys):
+    with patch('six.moves.input', something2) as m:
+        PriviledgedArgumentsExampleCommand().main()
+    
+    out, err = capsys.readouterr()
+    assert out == 'Password reset required\n'
