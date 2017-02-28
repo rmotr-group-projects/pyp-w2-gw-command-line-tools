@@ -98,3 +98,78 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+    
+    def test_reset_user_invalid(self):
+        authenticated_mock = MagicMock(return_value=None)
+
+        class DummyLoginCommand(CheckResetRequiredMixin, LoginMixin):
+            def request_input_data(self, data):
+                if data == 'username':
+                    return 'no-user'
+                elif data == 'password':
+                    return 'no-pass'
+
+            authenticate = authenticated_mock
+
+        obj = DummyLoginCommand()
+        user = obj.login()
+
+        self.assertIsNone(user)
+        obj.authenticate.assert_called_once_with('no-user', 'no-pass')
+        self.assertEqual(obj.is_authenticated, 'unauth')
+        self.assertIsNone(obj.user)
+        
+    def test_reset_authenticate_user(self):
+
+        class DummyLoginCommand(CheckResetRequiredMixin, 
+                                LoginMixin, 
+                                SimpleAuthenticationMixin):
+            AUTHORIZED_USERS = [{
+                'username': 'johndoe',
+                'password': 'PWD$123'
+                }]
+                
+            def request_input_data(self, data):
+                if data == 'username':
+                    return 'johndoe'
+                elif data == 'password':
+                    return 'PWD$123'
+
+        obj = DummyLoginCommand()
+        user = obj.login()
+
+        self.assertEqual(user, {
+            'username': 'johndoe',
+            'password': 'PWD$123'
+        })
+        self.assertEqual(user, obj.user)
+        self.assertEqual(obj.is_authenticated, 'auth')
+        
+    def test_reset_reset_user(self):
+
+        class DummyLoginCommand(CheckResetRequiredMixin, 
+                                LoginMixin, 
+                                SimpleAuthenticationMixin):
+            AUTHORIZED_USERS = [{
+                'username': 'johndoe',
+                'password': 'PWD$123',
+                }, {
+                'username': 'johndoe*',
+                'password': 'PWD$123'
+                }]
+                
+            def request_input_data(self, data):
+                if data == 'username':
+                    return 'johndoe'
+                elif data == 'password':
+                    return 'PWD$123'
+
+        obj = DummyLoginCommand()
+        user = obj.login()
+
+        self.assertEqual(user, {
+           'username': 'johndoe',
+           'password': 'PWD$123'
+        })
+        self.assertEqual(user, obj.user)
+        self.assertEqual(obj.is_authenticated, 'auth_pw_reset')
