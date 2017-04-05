@@ -1,11 +1,14 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SimpleAuthenticationMixin,
+    FileOutputMixin, InputRequestMixin, SimpleAuthenticationMixin,
     LoginMixin)
 
+from datetime import datetime
+# __all__ = [
+#     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
+#     'PriviledgedArgumentsExampleCommand']
 __all__ = [
-    'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
+    'ArgumentCalculatorCommand', 'InputCalculatorCommand', 'LogUnauthorizedInputCalculatorCommand']
 
 
 class BaseCalculatorCommand(object):
@@ -60,11 +63,33 @@ class InputCalculatorCommand(SimpleCommandLineParserMixin,
         self.write("Result: {}".format(result))
 
 
-class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
-                                         InputRequestMixin,
-                                         StdoutOutputMixin,
-                                         SimpleAuthenticationMixin,
-                                         LoginMixin):
+# class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
+#                                          InputRequestMixin,
+#                                          StdoutOutputMixin,
+#                                          SimpleAuthenticationMixin,
+#                                          LoginMixin):
+#     AUTHORIZED_USERS = [{
+#         'username': 'admin',
+#         'password': 'admin'
+#     }, {
+#         'username': 'rmotr',
+#         'password': 'python'
+#     }]
+
+#     def main(self):
+#         if self.is_authenticated:
+#             username = self.user['username']
+#             self.write("Welcome %s!" % username)
+#         else:
+#             self.write("Not authorized :(")
+
+
+class LogUnauthorizedInputCalculatorCommand(InputCalculatorCommand,
+                                                LoginMixin,
+                                                FileOutputMixin,
+                                                SimpleAuthenticationMixin):
+    
+    ''' command line tool for logging unauthorized users commands '''
     AUTHORIZED_USERS = [{
         'username': 'admin',
         'password': 'admin'
@@ -72,10 +97,22 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
         'username': 'rmotr',
         'password': 'python'
     }]
-
+    
+    FILE_PATH = "./logs/log.txt"
+    
     def main(self):
+        self.login()
         if self.is_authenticated:
-            username = self.user['username']
-            self.write("Welcome %s!" % username)
+            StdoutOutputMixin.write(self, "Authorized")
+            result = self.calculate()
+            StdoutOutputMixin.write(self,"result was {}".format(result))
         else:
-            self.write("Not authorized :(")
+            # unauthorized
+            StdoutOutputMixin.write(self, "Unauthorized login")
+            FileOutputMixin.write(self, "Unauthorized login at : {}\n".format(datetime.now()))
+            result = self.calculate()
+            
+            
+            
+        # result = self.calculate()
+        

@@ -17,3 +17,5 @@ class FileOutputMixin(object):
 
         with open(self.FILE_PATH, 'a') as fp:
             fp.write(message)
+        
+
