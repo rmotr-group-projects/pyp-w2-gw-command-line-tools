@@ -1,6 +1,6 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SimpleAuthenticationMixin,
+    InputRequestMixin, SimpleAuthenticationMixin, CommaSeparatedCommandLineParserMixin,
     LoginMixin)
 
 __all__ = [
@@ -79,3 +79,25 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+
+class CommaSeparatedCommandLineCalculator(CommaSeparatedCommandLineParserMixin,
+                                          StdoutOutputMixin):
+                                              
+    """
+    Should be invoked:
+    - python cmd.py "3,4,sum"
+    """
+
+    operations = {
+        'sum': lambda x: sum(x),
+        # 'product': lambda x: x
+    }
+
+   
+    def main(self):
+        self.parse_arguments()
+        operation = self._arguments[-1]
+        args_list = self._arguments[1:-1]
+        args_list = [int(x) for x in args_list]
+        return_val = self.operations[operation](args_list)
+        self.write(str(return_val))

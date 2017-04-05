@@ -1,4 +1,4 @@
 from .data_request_mixins import InputRequestMixin, ArgumentsRequestMixin
-from .parser_mixins import SimpleCommandLineParserMixin
+from .parser_mixins import SimpleCommandLineParserMixin, CommaSeparatedCommandLineParserMixin
 from .output import StdoutOutputMixin, FileOutputMixin
 from .auth import LoginMixin, SimpleAuthenticationMixin

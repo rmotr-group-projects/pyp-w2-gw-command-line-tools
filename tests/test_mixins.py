@@ -1,4 +1,5 @@
 import sys
+import json
 import unittest
 from mock import patch, MagicMock
 
@@ -20,6 +21,26 @@ class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
             m = SimpleCommandLineParserMixin()
             m.parse_arguments()
             self.assertEqual(len(m._arguments), 0)
+            
+
+class CommaSeparatedCommandLineParserMixinTestCase(unittest.TestCase):
+    def test_with_arguments(self):
+        testargs_string = ["my_script", "3,4,add"]
+        test_args = ["my_script", "3", "4", "add"]
+        
+        with patch.object(sys, 'argv', testargs_string):
+            m = parser_mixins.CommaSeparatedCommandLineParserMixin()
+            m.parse_arguments()
+            self.assertTrue("4" in m._arguments)
+            self.assertEqual(m._arguments, test_args)
+
+    def test_with_no_arguments(self):
+        testargs_string = ["my_script"]
+        testargs = ["my_script"]
+        with patch.object(sys, 'argv', testargs_string):
+            m = parser_mixins.CommaSeparatedCommandLineParserMixin()
+            m.parse_arguments()
+            self.assertEqual(len(m._arguments), 1)
 
 
 class InputTestCase(unittest.TestCase):
@@ -78,7 +99,21 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
 
         obj.authenticate.assert_called_once_with('johndoe', 'PWD$123')
         self.assertTrue(obj.is_authenticated)
-
+        
+        
+    def test_JSON_auth(self):
+        import json
+        
+        AUTHORIZED_USERS = []
+        test_user = json.dumps({'username': 'pythonLover1', 'password': 'pyth0n'})
+        test_user = json.loads(test_user)
+        AUTHORIZED_USERS.append(test_user)
+        mixin = auth.JSONAuthenticationMixin()
+        mixin.AUTHORIZED_USERS = AUTHORIZED_USERS
+        
+        self.assertEqual(test_user, mixin.authenticate(test_user))
+        
+        
     def test_invalid_user(self):
         authenticated_mock = MagicMock(return_value=None)
 
