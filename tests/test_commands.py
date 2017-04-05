@@ -34,3 +34,13 @@ def test_calculator_with_user_input(capsys):
 
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
+
+
+def test_caesar_cipher(capsys):
+    testargs = ["encrypt", 'message=HelloWorld', "cipher_key=6"]
+    with patch.object(sys, 'argv', testargs):
+        Caesar_Cipher().main()
+
+    out, err = capsys.readouterr()
+    assert out == "Encrypted Message: 'NkrruCuxrj'\n"
+      
