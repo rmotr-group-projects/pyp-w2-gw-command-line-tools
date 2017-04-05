@@ -34,3 +34,37 @@ def test_calculator_with_user_input(capsys):
 
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
+
+def password_input(message):
+    if 'username' in message:
+        return 'admin'
+    if 'password' in message:
+        return 'admin'
+    
+def test_login(capsys):
+    
+    
+    with patch('six.moves.input', password_input) as x:
+        PriviledgedArgumentsExampleCommand().main()
+    
+    out, err = capsys.readouterr()
+    assert out == 'Welcome admin!\n'
+
+
+def toDoInput(message):
+    if 'title' in message:
+        return 'complete decorators assignments'
+    if 'body' in message:
+        return 'There are a number of class assignments for python decorators'
+    if 'questions' in message:
+        return 6
+    if 'Would you like to view?' in message:
+        return 'y'
+
+def test_to_do_list(capsys):
+    
+    with patch('six.moves.input', toDoInput) as x:
+        ToDoListCommand().main()
+    
+    out, err = capsys.readouterr()
+    assert out ==  "{'body': 'There are a number of class assignments for python decorators',\n 'questions': 6,\n 'title': 'complete decorators assignments'}\n"

@@ -1,11 +1,12 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
     InputRequestMixin, SimpleAuthenticationMixin,
-    LoginMixin)
+    LoginMixin,
+    OutputJSONMixin)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
+    'PriviledgedArgumentsExampleCommand','ToDoListCommand']
 
 
 class BaseCalculatorCommand(object):
@@ -53,6 +54,7 @@ class InputCalculatorCommand(SimpleCommandLineParserMixin,
 
     Should be invoked:
     - python cmd.py
+    
     """
 
     def main(self):
@@ -79,3 +81,17 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+
+
+class ToDoListCommand(SimpleCommandLineParserMixin,
+                        InputRequestMixin,
+                        StdoutOutputMixin,
+                        OutputJSONMixin):
+    task_dict = {}
+
+    def main(self):
+        self.task_dict['title'] = self.request_input_data('title')
+        self.task_dict['body'] = self.request_input_data('body')
+        self.task_dict['questions'] = self.request_input_data('questions')
+        if self.request_input_data('Would you like to view?')=='y':
+            self.output_json(self.task_dict)
