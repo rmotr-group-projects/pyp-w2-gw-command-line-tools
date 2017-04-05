@@ -5,7 +5,7 @@ from .mixins import (
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
+    'PriviledgedArgumentsExampleCommand', 'PolishSpeak']
 
 
 class BaseCalculatorCommand(object):
@@ -65,6 +65,10 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
                                          StdoutOutputMixin,
                                          SimpleAuthenticationMixin,
                                          LoginMixin):
+#TODO: sqlite3 connect 
+#TODO: json connect
+     
+    
     AUTHORIZED_USERS = [{
         'username': 'admin',
         'password': 'admin'
@@ -79,3 +83,20 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+
+class PolishSpeak(SimpleCommandLineParserMixin, InputRequestMixin, StdoutOutputMixin ):
+    
+    def EnglishInput(self):
+        sentence = str(self.request_input_data('EnglishSentence'))
+        joiner = 'skee '
+        new_word = sentence.split()
+        joined_word = joiner.join(new_word)
+        joined_word += 'skee'
+        
+        return joined_word
+        
+    def main(self):
+        Polish = self.EnglishInput()
+        self.write("Your Polish-speak is: {}".format(Polish))
+        
+       

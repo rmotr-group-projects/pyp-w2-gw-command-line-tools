@@ -34,3 +34,14 @@ def test_calculator_with_user_input(capsys):
 
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
+
+def sent(sentence):
+    if 'EnglishSentence' in sentence:
+        return 'Hello World'
+
+def test_polishspeak(capsys):
+    with patch('six.moves.input', sent): 
+        PolishSpeak().main()
+        
+    out, err = capsys.readouterr()
+    assert out == "Your Polish-speak is: Helloskee Worldskee\n"
