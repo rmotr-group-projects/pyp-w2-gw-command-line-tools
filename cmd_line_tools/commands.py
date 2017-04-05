@@ -92,7 +92,8 @@ class Caesar_Cipher(SimpleCommandLineParserMixin,
         for letter in message:
             if not letter.isalpha():
                 encrypted += letter
-            if 96 < (ord(letter) + cipher_key) < 123 or 64 < ord(letter) + cipher_key < 91:
+            if (96 < (ord(letter) + cipher_key) < 123 
+                or 64 < ord(letter) + cipher_key < 91):
                 encrypted += chr(ord(letter) + cipher_key)
             else:
                 encrypted += chr(ord(letter) + cipher_key - 26)

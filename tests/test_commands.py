@@ -11,7 +11,7 @@ from cmd_line_tools.commands import *
 # we're using capture fixtures.
 # Read more here: http://doc.pytest.org/en/latest/capture.html
 def test_calculator_with_arguments(capsys):
-    testargs = ["cmd", "x_value=15", "y_value=7", "operation=addition"]
+    testargs = ["cmd","x_value=15","y_value=7","operation=addition"]
     with patch.object(sys, 'argv', testargs):
         ArgumentCalculatorCommand().main()
 
@@ -37,7 +37,7 @@ def test_calculator_with_user_input(capsys):
 
 
 def test_caesar_cipher(capsys):
-    testargs = ["encrypt", 'message=HelloWorld', "cipher_key=6"]
+    testargs = ["encrypt",'message=HelloWorld',"cipher_key=6"]
     with patch.object(sys, 'argv', testargs):
         Caesar_Cipher().main()
 
