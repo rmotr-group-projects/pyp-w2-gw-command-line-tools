@@ -4,6 +4,7 @@ import pytest
 from mock import patch
 
 from cmd_line_tools.commands import *
+from cmd_line_tools.commands import CommaSeparatedCommandLineCalculator
 
 
 # These tests are written in a different way than the ones you're probably
@@ -34,3 +35,11 @@ def test_calculator_with_user_input(capsys):
 
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
+
+
+def test_comma_calculator(capsys):
+    testargs_string = ["cmd", "3,4,sum"]
+    with patch.object(sys, 'argv', testargs_string):
+        CommaSeparatedCommandLineCalculator().main()
+    out, err = capsys.readouterr()
+    assert out == "7\n"

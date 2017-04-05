@@ -1,3 +1,5 @@
+import json
+
 class LoginMixin(object):
     """Basic login mixin.
 
@@ -36,3 +38,11 @@ class SimpleAuthenticationMixin(object):
 # Can you think two more authentication services?
 # A Json based service and one based on a sqlite3 database?
 # Both are builtin modules in Python, should be easy ;)
+
+class JSONAuthenticationMixin(object):
+    AUTHORIZED_USERS = []
+
+    def authenticate(self, user):
+        for authenticated_user in self.AUTHORIZED_USERS:
+            if authenticated_user == json.loads(json.dumps({'username': user['username'], 'password':  user['password']})):
+                return user
