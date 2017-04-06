@@ -79,14 +79,14 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+            
 
 class Caesar_Cipher(SimpleCommandLineParserMixin, 
-                    #InputRequestMixin,
                     ArgumentsRequestMixin,
                     StdoutOutputMixin):
        
     def caesar_cipher(self):
-        message = str(self.request_input_data('message'))
+        message = self.request_input_data('message')
         cipher_key = int(self.request_input_data('cipher_key'))
         encrypted = ''
         for letter in message:
@@ -96,10 +96,11 @@ class Caesar_Cipher(SimpleCommandLineParserMixin,
                 or 64 < ord(letter) + cipher_key < 91):
                 encrypted += chr(ord(letter) + cipher_key)
             else:
-                encrypted += chr(ord(letter) + cipher_key - 26)
+                if letter.isalpha():
+                    encrypted += chr(ord(letter) + cipher_key - 26)
         return encrypted
         
     def main(self):
         self.parse_arguments()
         result = self.caesar_cipher()
-        self.write("Encrypted Message: '{}'".format(result))
+        self.write("Encrypted message: {}".format(result))

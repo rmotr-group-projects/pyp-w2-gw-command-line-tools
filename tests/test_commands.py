@@ -26,7 +26,7 @@ def something(message):
         return '5'
     if 'operation' in message:
         return 'subtraction'
-
+        
 
 def test_calculator_with_user_input(capsys):
     with patch('six.moves.input', something) as m:
@@ -37,10 +37,9 @@ def test_calculator_with_user_input(capsys):
 
 
 def test_caesar_cipher(capsys):
-    testargs = ["encrypt",'message=HelloWorld',"cipher_key=6"]
+    testargs = ["encrypt","message='Hello World'","cipher_key=6"]
     with patch.object(sys, 'argv', testargs):
         Caesar_Cipher().main()
 
     out, err = capsys.readouterr()
-    assert out == "Encrypted Message: 'NkrruCuxrj'\n"
-      
+    assert out == "Encrypted message: 'Nkrru Cuxrj'\n"

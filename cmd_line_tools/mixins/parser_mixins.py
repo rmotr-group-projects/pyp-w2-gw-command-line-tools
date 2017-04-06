@@ -12,7 +12,8 @@ class SimpleCommandLineParserMixin(object):
     def parse_arguments(self):
         p = argparse.ArgumentParser()
         p.add_argument('cmd', nargs='*')
-        args = vars(p.parse_args())
-        pos = args.pop('cmd')
-        d = dict(i.split('=') for i in pos if '=' in i)
-        setattr(self, self.ARGUMENTS_ATTR_NAME, d)
+        setattr(
+        self, 
+        self.ARGUMENTS_ATTR_NAME, 
+        dict(i.split('=') for i in vars(p.parse_args()).pop('cmd') if '=' in i)
+        )
