@@ -1,21 +1,19 @@
 import sys
+import argparse
 
 __all__ = ['SimpleCommandLineParserMixin']
 
 
 class SimpleCommandLineParserMixin(object):
+    
     ARGUMENTS_ATTR_NAME = '_arguments'
 
-    def parse_arguments(self):
-        arguments = getattr(self, self.ARGUMENTS_ATTR_NAME, {})
-
-        for argv in sys.argv:
-            if '=' in argv:
-                arguments.update(dict([tuple(argv.split('='))]))
-
-        # Equivalent:
-        # self._arguments = arguments
-        setattr(self, self.ARGUMENTS_ATTR_NAME, arguments)
-
-
 # Can you implement an argparse version?
+    def parse_arguments(self):
+        p = argparse.ArgumentParser()
+        p.add_argument('cmd', nargs='*')
+        setattr(
+        self, 
+        self.ARGUMENTS_ATTR_NAME, 
+        dict(i.split('=') for i in vars(p.parse_args()).pop('cmd') if '=' in i)
+        )

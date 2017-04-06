@@ -5,7 +5,7 @@ from .mixins import (
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
+    'PriviledgedArgumentsExampleCommand', 'Caesar_Cipher']
 
 
 class BaseCalculatorCommand(object):
@@ -79,3 +79,28 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+            
+
+class Caesar_Cipher(SimpleCommandLineParserMixin, 
+                    ArgumentsRequestMixin,
+                    StdoutOutputMixin):
+       
+    def caesar_cipher(self):
+        message = self.request_input_data('message')
+        cipher_key = int(self.request_input_data('cipher_key'))
+        encrypted = ''
+        for letter in message:
+            if not letter.isalpha():
+                encrypted += letter
+            if (96 < (ord(letter) + cipher_key) < 123 
+                or 64 < ord(letter) + cipher_key < 91):
+                encrypted += chr(ord(letter) + cipher_key)
+            else:
+                if letter.isalpha():
+                    encrypted += chr(ord(letter) + cipher_key - 26)
+        return encrypted
+        
+    def main(self):
+        self.parse_arguments()
+        result = self.caesar_cipher()
+        self.write("Encrypted message: {}".format(result))

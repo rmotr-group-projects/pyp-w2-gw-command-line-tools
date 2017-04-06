@@ -7,7 +7,7 @@ from cmd_line_tools.mixins import *
 
 class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
     def test_with_arguments(self):
-        testargs = ["my_script", "username=johndoe", "password=123"]
+        testargs = ["my_script","username=johndoe","password=123"]
         with patch.object(sys, 'argv', testargs):
             m = SimpleCommandLineParserMixin()
             m.parse_arguments()
