@@ -109,7 +109,7 @@ class ResetPassword(InputRequestMixin,
 class JudgePatriceLessner(InputRequestMixin, JudgePatriceLessnerMixin):
 
     def main(self):
-        yourhonour = str(self.request_input_data("What's on your mind?"))
+        yourhonour = str(self.request_input_data("your opinion"))
         
         inmyopinion = self.write(yourhonour)
 
