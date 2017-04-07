@@ -1,12 +1,12 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
     InputRequestMixin, SimpleAuthenticationMixin,
-    LoginMixin)
+    LoginMixin, CreateNewUserMixin, ResetPasswordMixin, JudgePatriceLessnerMixin)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
-
+    'PriviledgedArgumentsExampleCommand', 'CreateNewUser', 'ResetPassword', 'JudgePatriceLessner']
+import pdb
 
 class BaseCalculatorCommand(object):
     """Base command to demonstrate the parsing/requesting mixins."""
@@ -79,3 +79,38 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
             self.write("Welcome %s!" % username)
         else:
             self.write("Not authorized :(")
+
+# New commands
+
+class CreateNewUser(InputRequestMixin, 
+                    CreateNewUserMixin, 
+                    StdoutOutputMixin, 
+                    SimpleCommandLineParserMixin):
+    
+    def main(self):
+        new_user = self.create_new_user()
+        self.write("User added to the list")
+        
+class ResetPassword(InputRequestMixin, 
+                    ResetPasswordMixin, 
+                    StdoutOutputMixin, 
+                    SimpleCommandLineParserMixin,
+                    LoginMixin,
+                    SimpleAuthenticationMixin):
+    AUTHORIZED_USERS = [{'username': "admin123", 'password': 'passW0rd123'}]
+    
+    def main(self):
+        #pdb.set_trace()
+        self.login()
+        if self.is_authenticated:
+            self.reset_password()
+            self.write("Password successfully changed")
+
+class JudgePatriceLessner(InputRequestMixin, JudgePatriceLessnerMixin):
+
+    def main(self):
+        yourhonour = str(self.request_input_data("What's on your mind?"))
+        
+        inmyopinion = self.write(yourhonour)
+
+        return inmyopinion
