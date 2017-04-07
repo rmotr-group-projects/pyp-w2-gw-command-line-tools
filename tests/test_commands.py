@@ -83,7 +83,7 @@ def test_reset_password(capsys):
     assert 'Password succ' in out
 
 def your_honour(message):
-    if 'What' in message:
+    if 'your opinion' in message:
         return 'A log may float in a river, but that does not make it a crocodile'
 
 def test_judge_patrice_lessner(capsys):
