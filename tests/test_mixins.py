@@ -98,3 +98,17 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+    
+    def test_reset_password(self):
+        
+        class DummyResetPassword(ResetPasswordMixin):
+            AUTHORIZED_USERS = [{'username': "admin123", 'password': 'passW0rd123'}]
+            _authenticated_user = AUTHORIZED_USERS[0]
+            def request_input_data(self, data):
+                if data.startswith('new password'):
+                    return "pAssw0rd"
+            
+        obj = DummyResetPassword()
+        self.assertEqual(obj.AUTHORIZED_USERS[0]['password'], 'passW0rd123')
+        obj.reset_password()
+        self.assertEqual(obj.AUTHORIZED_USERS[0]['password'], 'pAssw0rd')
