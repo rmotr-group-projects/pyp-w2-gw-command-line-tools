@@ -18,6 +18,14 @@ def test_calculator_with_arguments(capsys):
     out, err = capsys.readouterr()
     assert out == 'Result: 22\n'
 
+def test_argparse_calculator_with_arguments(capsys):
+    testargs = ["cmd", "--x_value", "15", "--y_value", "7", "--operation", "addition"]
+
+    with patch.object(sys, 'argv', testargs):
+        ArgparseArgumentCalculatorCommand().main()
+
+    out, err = capsys.readouterr()
+    assert out == 'Result: 22\n'
 
 def something(message):
     if 'x_value' in message:
@@ -34,3 +42,18 @@ def test_calculator_with_user_input(capsys):
 
     out, err = capsys.readouterr()
     assert out == 'Result: 2\n'
+
+def jsonsomething(message):
+    if 'username' in message:
+        return 'admin'
+    if 'password' in message:
+        return 'admin'
+
+def test_jsonauth_with_user_input(capsys):
+    with patch('six.moves.input', jsonsomething) as m:
+        JsonArgumentsExampleCommand().main()
+
+    out, err = capsys.readouterr()
+    assert out == 'Welcome admin!\n'
+
+

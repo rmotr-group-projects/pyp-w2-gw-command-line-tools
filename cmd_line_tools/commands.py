@@ -1,11 +1,11 @@
 from .mixins import (
     SimpleCommandLineParserMixin, ArgumentsRequestMixin, StdoutOutputMixin,
-    InputRequestMixin, SimpleAuthenticationMixin,
-    LoginMixin)
+    InputRequestMixin, SimpleAuthenticationMixin, ArgParseCommandLineParserMixin,
+    LoginMixin, JsonAuthenticationMixin)
 
 __all__ = [
     'ArgumentCalculatorCommand', 'InputCalculatorCommand',
-    'PriviledgedArgumentsExampleCommand']
+    'PriviledgedArgumentsExampleCommand', 'ArgparseArgumentCalculatorCommand', 'JsonArgumentsExampleCommand']
 
 
 class BaseCalculatorCommand(object):
@@ -41,6 +41,7 @@ class ArgumentCalculatorCommand(SimpleCommandLineParserMixin,
 
     def main(self):
         self.parse_arguments()
+        # now self._arguments = {'x_value': 5, 'y_value': 7, 'operation': 'add'}
         result = self.calculate()
         self.write("Result: {}".format(result))
 
@@ -60,6 +61,23 @@ class InputCalculatorCommand(SimpleCommandLineParserMixin,
         self.write("Result: {}".format(result))
 
 
+class ArgparseArgumentCalculatorCommand(ArgParseCommandLineParserMixin,
+                             ArgumentsRequestMixin,  # Different mixin
+                                StdoutOutputMixin,
+                                BaseCalculatorCommand):
+    """Extends the BaseCalculatorCommand to receive cmd line arguments.
+
+    Should be invoked:
+    - python cmd.py --x_value 15 --y_value 7 --operation addition
+    """
+
+    def main(self):
+        self.parse_arguments()
+        # now self._arguments = {'x_value': 5, 'y_value': 7, 'operation': 'add'}
+        result = self.calculate()
+        self.write("Result: {}".format(result))
+
+
 class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
                                          InputRequestMixin,
                                          StdoutOutputMixin,
@@ -72,7 +90,22 @@ class PriviledgedArgumentsExampleCommand(SimpleCommandLineParserMixin,
         'username': 'rmotr',
         'password': 'python'
     }]
+    
+    def main(self):
+        if self.is_authenticated:
+            username = self.user['username']
+            self.write("Welcome %s!" % username)
+        else:
+            self.write("Not authorized :(")
 
+
+class JsonArgumentsExampleCommand(SimpleCommandLineParserMixin,
+                                         InputRequestMixin,
+                                         StdoutOutputMixin,
+                                         JsonAuthenticationMixin,
+                                         LoginMixin):
+    USER_FILE = './tests/users.json'
+    
     def main(self):
         if self.is_authenticated:
             username = self.user['username']
