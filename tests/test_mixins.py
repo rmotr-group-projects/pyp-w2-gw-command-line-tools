@@ -5,6 +5,7 @@ from mock import patch, MagicMock
 from cmd_line_tools.mixins import *
 
 
+
 class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
     def test_with_arguments(self):
         testargs = ["my_script", "username=johndoe", "password=123"]
@@ -98,3 +99,62 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+
+
+# New tests below
+
+class JsonAuthenticationMixinTeestCase(unittest.TestCase):
+    
+    def test_authenticate_user(self):
+        import os
+        print(os.getcwd())
+        # authenticated_mock = MagicMock(return_value={
+        #     'username': 'user1',
+        #     'password': 'supersecret'
+        # })
+
+        class DummyLoginCommand(LoginMixin, JsonAuthenticationMixin):
+            def request_input_data(self, data):
+                if data == 'username':
+                    return 'user1'
+                elif data == 'password':
+                    return 'supersecret'
+
+            # authenticate = authenticated_mock
+
+        obj = DummyLoginCommand()
+        user = obj.login()
+        
+        self.assertEqual(user, {
+            'username': 'user1',
+            'password': 'supersecret'
+        })
+        self.assertEqual(user, obj.user)
+
+        # obj.authenticate.assert_called_once_with('user1', 'supersecret')
+        self.assertTrue(obj.is_authenticated)
+        
+        
+        
+class Sqlite3AuthenticationMixinTestCase(unittest.TestCase):
+    
+    def test_authenticate_user(self):
+        class DummyLoginCommand(LoginMixin,Sqlite3AuthenticationMixin):
+            def request_input_data(self, data):
+                if data == 'username':
+                    return 'user1'
+                elif data == 'password':
+                    return 'supersecret'
+
+        obj = DummyLoginCommand()
+        user = obj.login()
+        
+        self.assertEqual(user, {
+            'username': 'user1',
+            'password': 'supersecret'
+        })
+        self.assertEqual(user, obj.user)
+
+        # obj.authenticate.assert_called_once_with('user1', 'supersecret')
+        self.assertTrue(obj.is_authenticated)
+
