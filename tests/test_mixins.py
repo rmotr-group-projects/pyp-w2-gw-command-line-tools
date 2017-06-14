@@ -22,6 +22,22 @@ class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
             self.assertEqual(len(m._arguments), 0)
 
 
+class SimpleCommandLineArgParseMixinTestCase(unittest.TestCase):
+    def test_with_arguments(self):
+        testargs = ["my_script", "username=johndoe", "password=123"]
+        with patch.object(sys, 'argv', testargs):
+            m = SimpleCommandLineParserMixin()
+            m.parse_arguments()
+            self.assertEqual(m._arguments['username'], 'johndoe')
+            self.assertEqual(m._arguments['password'], '123')
+
+    def test_with_no_arguments(self):
+        testargs = ["my_script"]
+        with patch.object(sys, 'argv', testargs):
+            m = SimpleCommandLineParserMixin()
+            m.parse_arguments()
+            self.assertEqual(len(m._arguments), 0)
+
 class InputTestCase(unittest.TestCase):
     def test_with_simple_arguments_request(self):
         mixin = InputRequestMixin()
