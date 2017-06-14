@@ -1,7 +1,6 @@
 import json
 import sqlite3
 import os
-from StringIO import StringIO
 
 # reads in json file for usernames/passwords
 class JsonAuthenticationMixin(object):
