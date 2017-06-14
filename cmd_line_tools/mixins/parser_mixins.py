@@ -10,22 +10,20 @@ class SimpleCommandLineParserMixin(object):
     def parse_arguments(self):
        
         arguments = getattr(self, self.ARGUMENTS_ATTR_NAME, {})
-        # why not just doing arguments = {} ?
-        # '''
+      
         # if hasattr(self, self.ARGUMENTS_ATTR_NAME):
         #     arguments = self._arguments
         # else:
         #     arguments = {}
-        # '''
-        # 1) self._arguments = {}
+        
+       
         for argv in sys.argv:
             if '=' in argv:
                 arguments.update(dict([tuple(argv.split('='))]))
 
-        # Equivalent:
-        # self._arguments = arguments
         setattr(self, self.ARGUMENTS_ATTR_NAME, arguments) 
-        # 2) ===> self._arguments = arguments
+        
+        
 
 # Can you implement an argparse version?
 
@@ -52,12 +50,12 @@ class AdvancedCommandLineParserMixin(object):
         setattr(self, self.ARGUMENTS_ATTR_NAME, arguments)
       
         
-          # for op in OPERATIONS:
-        #     parser.add_argument("--{}".format(op))
-            
-        # python cmd.py arg1 arg2
-        # python cmd.py --arg1=val1
-# """
+
+    
+#  # why not just doing arguments = {} ?
+        # 1) self._arguments = {}
+        # 2) ===> self._arguments = arguments
+
 # python my_command.py username=bob paassword=12345
 # python my_command.py --username bob --password 12345
-# """
+# 
