@@ -1,9 +1,9 @@
 import sys
 import unittest
 from mock import patch, MagicMock
+import StringIO
 
 from cmd_line_tools.mixins import *
-
 
 class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
     def test_with_arguments(self):
@@ -98,3 +98,27 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+
+'''
+Test Case for Logging Mixin
+'''
+class LoggingTestCase(unittest.TestCase):
+    def test_simple_logging(self):
+        mixin = LoggingMixin()
+        capturedOutput = StringIO.StringIO()
+        sys.stdout = capturedOutput
+    
+        mixin.log()
+        
+        sys.stdout = sys.__stdout__
+        
+        self.assertEqual( capturedOutput.getvalue(), 
+                        'Running function test_simple_logging\n----------\n')
+
+
+class TimingTestCase(unittest.TestCase):
+    def test_of_timing(self):
+        function = '"-".join(str(n) for n in range(100))'
+        mixin1 = TimingMixin()
+        value = mixin1.function_time(function)
+        self.assertEqual(type(value), float)
