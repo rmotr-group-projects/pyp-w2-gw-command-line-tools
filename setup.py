@@ -23,7 +23,7 @@ class PyTest(TestCommand):
 
 
 setup(
-    name='rmotr.com | Commandline Tools',
+    name='rmotr.com Commandline Tools',
     version='0.0.1',
     description="rmotr.com Group Project | Commandline Tools",
     author='rmotr.com',
