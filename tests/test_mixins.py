@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 import unittest
 from mock import patch, MagicMock
 
@@ -20,8 +21,24 @@ class SimpleCommandLineParserMixinTestCase(unittest.TestCase):
             m = SimpleCommandLineParserMixin()
             m.parse_arguments()
             self.assertEqual(len(m._arguments), 0)
-
-
+    
+class AdvancedCommandLineParserMixinTestCase(unittest.TestCase):
+    def test_with_arguments(self):
+        testargs = ["my_script", "--username", "johndoe", "--password", "123"]
+        with patch.object(sys, 'argv', testargs):
+            m = AdvancedCommandLineParserMixin()
+            m.parse_arguments()
+            self.assertEqual(m._arguments['username'], 'johndoe')
+            self.assertEqual(m._arguments['password'], '123')
+    
+    def test_with_no_arguments(self):
+        testargs = ["my_script"]
+        with patch.object(sys, 'argv', testargs):
+            m = AdvancedCommandLineParserMixin()
+            m.parse_arguments()
+            self.assertEqual(len(m._arguments), 0)
+    
+    
 class InputTestCase(unittest.TestCase):
     def test_with_simple_arguments_request(self):
         mixin = InputRequestMixin()
@@ -98,3 +115,28 @@ class AuthenticationMixinsTestCase(unittest.TestCase):
         obj.authenticate.assert_called_once_with('no-user', 'no-pass')
         self.assertFalse(obj.is_authenticated)
         self.assertIsNone(obj.user)
+
+class SimpleSQLite3AuthenticationMixinsTestCase(unittest.TestCase):
+    # import sqlite3
+    def test_simple_sqlite3_authentication(self):
+        conn = sqlite3.connect('test.db')
+
+        conn.execute('''CREATE TABLE IF NOT EXISTS USERS (USERNAME VARCHAR(30) NOT NULL, PASSWORD VARCHAR(30));''')
+        
+        try:
+            conn.execute("INSERT INTO USERS VALUES ('john', 'python')")
+        except sqlite3.IntegrityError:
+            pass
+        
+        mixin = SimpleSQLite3AuthenticationMixin()
+        username = 'john'
+        password = 'python'
+        self.assertTrue(mixin.login(conn,username,password))
+        password = 'fail'
+        self.assertFalse(mixin.login(conn,username,password))
+        
+             
+        
+        
+        
+    

@@ -36,3 +36,13 @@ class SimpleAuthenticationMixin(object):
 # Can you think two more authentication services?
 # A Json based service and one based on a sqlite3 database?
 # Both are builtin modules in Python, should be easy ;)
+
+class SimpleSQLite3AuthenticationMixin(object):
+    def login(self, conn, username, password):
+        sql = "SELECT COUNT(*) from USERS where USERNAME = '{}' and PASSWORD = '{}'".format(username, password)
+        cur = conn.execute(sql)
+        res = cur.fetchone()
+        
+        return username if res[0] else None
+        
+        
